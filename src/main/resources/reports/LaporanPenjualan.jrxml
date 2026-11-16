@@ -1,0 +1,80 @@
+<!-- Created with Jaspersoft Studio version 7.0.8.final using JasperReports Library version 7.0.8-6f896111  -->
+<jasperReport name="LaporanPenjualan" language="java" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5e7ba963-01de-4a15-8f7a-4b6a46b4ba2e">
+	<query language="sql"><![CDATA[SELECT t.id_transaksi, t.tanggal, t.total,
+       COALESCE(SUM(d.jumlah), 0) AS jumlah,
+       COALESCE(GROUP_CONCAT(CONCAT(b.nama_barang, ' (', d.jumlah, ')')
+                ORDER BY b.nama_barang SEPARATOR ', '), '-') AS rincian
+FROM transaksi t
+LEFT JOIN detail_transaksi d ON t.id_transaksi = d.id_transaksi
+LEFT JOIN barang b ON d.id_barang = b.id_barang
+GROUP BY t.id_transaksi, t.tanggal, t.total
+ORDER BY t.tanggal DESC, t.id_transaksi DESC]]></query>
+	<field name="id_transaksi" class="java.lang.Integer"/>
+	<field name="tanggal" class="java.sql.Timestamp"/>
+	<field name="total" class="java.lang.Double"/>
+	<field name="jumlah" class="java.lang.Integer"/>
+	<field name="rincian" class="java.lang.String"/>
+	<variable name="TOTAL_SEMUA" class="java.lang.Double" calculation="Sum">
+		<expression><![CDATA[$F{total}]]></expression>
+	</variable>
+	<background splitType="Stretch"/>
+	<title height="79" splitType="Stretch">
+		<element kind="staticText" uuid="3f51eeb1-8360-4948-8061-d4b9f4a41c7b" x="102" y="30" width="350" height="30" fontSize="18.0" bold="true" hTextAlign="Center">
+			<text><![CDATA[LAPORAN PENJUALAN WARUNGKITA]]></text>
+		</element>
+	</title>
+	<pageHeader height="65" splitType="Stretch"/>
+	<columnHeader height="61" splitType="Stretch">
+		<element kind="staticText" uuid="7810d110-01bb-4d11-ac74-8487c4c7a744" x="0" y="15" width="40" height="30" fontSize="18.0" bold="false" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+			<property name="com.jaspersoft.studio.unit.width" value="px"/>
+			<text><![CDATA[NO.]]></text>
+		</element>
+		<element kind="staticText" uuid="8b69d89c-af1c-48b7-a760-9e7b67c18547" x="60" y="15" width="90" height="30" markup="rtf" fontSize="18.0" bold="false" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.unit.width" value="px"/>
+			<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			<text><![CDATA[Tanggal]]></text>
+		</element>
+		<element kind="staticText" uuid="804905de-7047-4927-840f-30ea75c8eafe" x="465" y="15" width="90" height="30" fontSize="18.0" bold="false" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.unit.width" value="px"/>
+			<text><![CDATA[Total]]></text>
+		</element>
+		<element kind="staticText" uuid="a361fd4a-b854-4a73-b54c-b5c4b7477670" x="390" y="15" width="70" height="30" fontSize="18.0" bold="false" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.unit.width" value="px"/>
+			<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			<text><![CDATA[Jumlah]]></text>
+		</element>
+		<element kind="staticText" uuid="efa14fa3-1272-47a7-b1f4-2543d7ed2390" x="167" y="15" width="220" height="30" fontSize="18.0" bold="false" hTextAlign="Center">
+			<property name="com.jaspersoft.studio.unit.width" value="px"/>
+			<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			<text><![CDATA[Rincian Barang]]></text>
+		</element>
+	</columnHeader>
+		<detail>
+		<band height="22" splitType="Stretch">
+		<element kind="textField" uuid="a1000001-0000-4000-8000-000000000001" x="0" y="0" width="40" height="22" fontSize="11.0" hTextAlign="Center" textAdjust="StretchHeight" pattern="#,##0">
+			<expression><![CDATA[$V{REPORT_COUNT}]]></expression>
+		</element>
+		<element kind="textField" uuid="a1000001-0000-4000-8000-000000000002" x="55" y="0" width="105" height="22" fontSize="11.0" hTextAlign="Center" textAdjust="StretchHeight" pattern="dd-MM-yyyy HH:mm">
+			<expression><![CDATA[$F{tanggal}]]></expression>
+		</element>
+		<element kind="textField" uuid="a1000001-0000-4000-8000-000000000003" x="167" y="0" width="220" height="22" fontSize="11.0" hTextAlign="Left" textAdjust="StretchHeight">
+			<expression><![CDATA[$F{rincian}]]></expression>
+		</element>
+		<element kind="textField" uuid="a1000001-0000-4000-8000-000000000004" x="390" y="0" width="70" height="22" fontSize="11.0" hTextAlign="Center" textAdjust="StretchHeight">
+			<expression><![CDATA[$F{jumlah}]]></expression>
+		</element>
+		<element kind="textField" uuid="a1000001-0000-4000-8000-000000000005" x="465" y="0" width="90" height="22" fontSize="11.0" hTextAlign="Right" textAdjust="StretchHeight" pattern="Rp #,##0">
+			<expression><![CDATA[$F{total}]]></expression>
+		</element>
+		</band>
+	</detail>
+	<columnFooter height="45" splitType="Stretch"/>
+	<pageFooter height="54" splitType="Stretch"/>
+	<summary height="42" splitType="Stretch">
+		<element kind="textField" uuid="a1000001-0000-4000-8000-000000000006" x="200" y="10" width="355" height="24" fontSize="13.0" bold="true" hTextAlign="Right">
+			<expression><![CDATA["Total Seluruh Penjualan: Rp " + new java.text.DecimalFormat("#,##0").format($V{TOTAL_SEMUA} == null ? 0 : $V{TOTAL_SEMUA})]]></expression>
+		</element>
+	</summary>
+</jasperReport>

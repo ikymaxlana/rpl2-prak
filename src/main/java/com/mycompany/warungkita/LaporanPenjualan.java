@@ -8,7 +8,15 @@ import java.awt.*;
 import java.sql.*;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.view.JasperViewer;
 
 public class LaporanPenjualan extends JFrame {
 
@@ -135,6 +143,13 @@ public class LaporanPenjualan extends JFrame {
         muatUlang.setFocusPainted(false);
         muatUlang.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
+        JButton lihatLaporan = new JButton("Lihat Laporan");
+        lihatLaporan.setFont(new Font("Arial", Font.BOLD, 12));
+        lihatLaporan.setBackground(new Color(25, 95, 55));
+        lihatLaporan.setForeground(putih);
+        lihatLaporan.setFocusPainted(false);
+        lihatLaporan.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
         JButton kembali = new JButton("Kembali");
         kembali.setFont(new Font("Arial", Font.BOLD, 12));
         kembali.setBackground(new Color(230, 235, 232));
@@ -144,6 +159,7 @@ public class LaporanPenjualan extends JFrame {
 
         JPanel tombol = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         tombol.setBackground(putih);
+        tombol.add(lihatLaporan);
         tombol.add(muatUlang);
         tombol.add(kembali);
 
@@ -153,6 +169,7 @@ public class LaporanPenjualan extends JFrame {
         add(bawah, BorderLayout.SOUTH);
 
         muatUlang.addActionListener(e -> muatLaporan());
+        lihatLaporan.addActionListener(e -> tampilkanLaporanJasper());
         kembali.addActionListener(e -> dispose());
 
         muatLaporan();
@@ -217,6 +234,44 @@ public class LaporanPenjualan extends JFrame {
                 "Gagal memuat laporan: " + e.getMessage(),
                 "Kesalahan",
                 JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void tampilkanLaporanJasper() {
+        try (InputStream jrxml = getClass()
+                .getResourceAsStream("/reports/LaporanPenjualan.jrxml")) {
+
+            if (jrxml == null) {
+                JOptionPane.showMessageDialog(this,
+                    "File reports/LaporanPenjualan.jrxml tidak ditemukan.",
+                    "Kesalahan", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            JasperReport laporan = JasperCompileManager.compileReport(jrxml);
+
+            Map<String, Object> parameter = new HashMap<>();
+            parameter.put("REPORT_LOCALE", new Locale("id", "ID"));
+
+            try (Connection con = Koneksi.getKoneksi()) {
+                if (con == null) {
+                    JOptionPane.showMessageDialog(this,
+                        "Koneksi database gagal. Periksa XAMPP dan database.");
+                    return;
+                }
+
+                JasperPrint print =
+                    JasperFillManager.fillReport(laporan, parameter, con);
+
+                JasperViewer viewer = new JasperViewer(print, false);
+                viewer.setTitle("Laporan Penjualan - WarungKita");
+                viewer.setVisible(true);
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                "Gagal menampilkan laporan: " + e.getMessage(),
+                "Kesalahan", JOptionPane.ERROR_MESSAGE);
         }
     }
 
